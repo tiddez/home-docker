@@ -1,4 +1,4 @@
-# home-docker
+# Docker Compose Scripts for my Home Server
 This is my personal config. You will need to tweak it to your needs.
 
 Example of usage:
