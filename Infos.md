@@ -1,19 +1,19 @@
-### ZEROTIER ###
+## ZEROTIER
 
-docker exec -it utils_zerotier_1 zerotier-cli info (Verifica se esta ok)
-docker exec -it utils_zerotier_1 zerotier-cli join xxxxxid (Entra na rede)
-docker exec -it utils_zerotier_1 zerotier-cli get xxxxxid ip (Verifica o IP)
-
-### ZEROTIER ###
-
-### PIHOLE ###
-
-O `systemd-resolved` está ocupando a porta **53**, impedindo que o Pi-hole inicie corretamente. Para resolver isso, você precisa desativar ou reconfigurar o `systemd-resolved`.  
+```bash
+docker exec -it utils_zerotier_1 zerotier-cli info # Verifica se está ok
+docker exec -it utils_zerotier_1 zerotier-cli join xxxxxid # Entra na rede
+docker exec -it utils_zerotier_1 zerotier-cli get xxxxxid ip # Verifica o IP
+```
 
 ---
 
+## PIHOLE
+
+O `systemd-resolved` está ocupando a porta **53**, impedindo que o Pi-hole inicie corretamente. Para resolver isso, você precisa desativar ou reconfigurar o `systemd-resolved`.
+
 ### 🔥 **1. Desativar o `systemd-resolved` (Recomendado para uso com Pi-hole)**
-Se você quer que **somente o Pi-hole cuide do DNS**, desative o `systemd-resolved`:  
+Se você quer que **somente o Pi-hole cuide do DNS**, desative o `systemd-resolved`:
 
 ```bash
 sudo systemctl stop systemd-resolved
@@ -74,5 +74,3 @@ Para verificar se o Pi-hole está funcionando como servidor DNS, use:
 nslookup google.com 127.0.0.1
 ```
 Se o Pi-hole estiver rodando corretamente, ele responderá à consulta.
-
-### PIHOLE ###
