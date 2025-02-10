@@ -1,0 +1,147 @@
+version: '3'
+
+x-name: 'media'
+
+services:
+  qbittorrent:
+    image: linuxserver/qbittorrent:latest
+    restart: unless-stopped
+    environment:
+      - TZ=America/Sao_Paulo
+      - WEBUI_PORT=8080
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - /home/bbsa/qbittorrent/config:/config
+      - /mnt/docker/Downloads/torrents:/downloads
+    ports:
+      - '8080:8080'
+      - '62609:62609'
+
+  jackett:
+    image: ghcr.io/linuxserver/jackett:latest
+    restart: unless-stopped
+    environment:
+      - TZ=America/Sao_Paulo
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - /home/bbsa/jackett/downloads:/downloads
+      - /home/bbsa/jackett/config:/config
+    ports:
+      - '9117:9117'
+
+  bazarr:
+    image: ghcr.io/linuxserver/bazarr:latest
+    restart: unless-stopped
+    environment:
+      - TZ=America/Sao_Paulo
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - /mnt/docker/Videos/radarr:/movies
+      - /mnt/docker/Videos/sonarr:/tv
+      - /home/bbsa/bazarr/appdata/config:/config
+    ports:
+      - '6767:6767'
+
+  overseerr:
+    image: sctx/overseerr
+    restart: unless-stopped
+    depends_on:
+      - qbittorrent
+    environment:
+      - TZ=America/Sao_Paulo
+      - PORT=5055
+    volumes:
+      - /home/bbsa/overseerr/config:/app/config
+    ports:
+      - '5055:5055'
+
+  prowlarr:
+    image: ghcr.io/hotio/prowlarr:latest
+    restart: unless-stopped
+    depends_on:
+      - flaresolverr
+    environment:
+      - TZ=America/Sao_Paulo
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - /home/bbsa/prowlarr/config:/config
+    ports:
+      - '9696:9696'
+
+  flaresolverr:
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    restart: unless-stopped
+    volumes:
+      - /home/bbsa/flaresolverr/config:/config
+    ports:
+      - '8191:8191'
+
+  sabnzbd:
+    image: lscr.io/linuxserver/sabnzbd:latest
+    restart: unless-stopped
+    environment:
+      - TZ=America/Sao_Paulo
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - /mnt/docker/Downloads/nzbget:/downloads
+      - /mnt/docker/Downloads/nzbget/incomplete:/incomplete-downloads
+      - /home/bbsa/nzbget/config:/config
+    ports:
+      - '6789:6789'
+
+  radarr:
+    image: ghcr.io/linuxserver/radarr:latest
+    restart: unless-stopped
+    depends_on:
+      - qbittorrent
+    environment:
+      - TZ=America/Sao_Paulo
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - /home/bbsa/radarr/appdata/config:/config
+      - /mnt/docker/Downloads/torrents:/downloads
+      - /mnt/docker/Videos/radarr/movies:/movies
+      - /mnt/docker/Videos/radarr/tvshow:/tvshow
+    ports:
+      - '7878:7878'
+
+  sonarr:
+    image: ghcr.io/linuxserver/sonarr:latest
+    restart: unless-stopped
+    depends_on:
+      - qbittorrent
+    environment:
+      - TZ=America/Sao_Paulo
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - /home/bbsa/sonarr/appdata/config:/config
+      - /mnt/docker/Videos/sonarr:/tv
+      - /mnt/docker/Downloads/torrents:/downloads
+    ports:
+      - '8989:8989'
+
+  plex:
+    image: plexinc/pms-docker:latest
+    shm_size: '2gb'
+    restart: unless-stopped
+    environment:
+      - TZ=America/Sao_Paulo
+      - PUID=1000
+      - PGID=1000
+      - VA_DRIVER=IHD
+    volumes:
+      - /home/bbsa/plex/config:/config
+      - /home/bbsa/plex/data:/data
+      - /home/bbsa/plex/transcode:/transcode
+      - /mnt/docker/Videos:/media
+    devices:
+      - /dev/dri:/dev/dri
+      - /dev/bus/usb:/dev/bus/usb
+    network_mode: host
