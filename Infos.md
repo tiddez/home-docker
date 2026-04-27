@@ -1,9 +1,23 @@
-## ZEROTIER
+## GRAFANA
 
+Grafana roda na porta `:3001`. Login padrão: `admin` / (senha definida em `GF_SECURITY_ADMIN_PASSWORD`).
+
+O datasource Prometheus já é provisionado automaticamente via `monitoring/provisioning/datasources/datasource.yaml` — não é necessário configurar manualmente.
+
+Para adicionar dashboards, importe pelo ID no grafana.com (ex: `1860` para Node Exporter Full, `14282` para cAdvisor).
+
+---
+
+## PROMETHEUS
+
+O arquivo de configuração está em `/home/docker/monitoring/prometheus.yml`. Os targets padrão são:
+- `prometheus:9090` — próprio Prometheus
+- `node-exporter:9100` — métricas do host
+- `cadvisor:8080` — métricas dos containers
+
+Para recarregar a configuração sem reiniciar:
 ```bash
-docker exec -it utils_zerotier_1 zerotier-cli info # Verifica se está ok
-docker exec -it utils_zerotier_1 zerotier-cli join xxxxxid # Entra na rede
-docker exec -it utils_zerotier_1 zerotier-cli get xxxxxid ip # Verifica o IP
+curl -X POST http://localhost:9090/-/reload
 ```
 
 ---

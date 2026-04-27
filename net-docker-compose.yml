@@ -1,6 +1,4 @@
-version: '3'
-
-x-name: 'net'
+name: net
 
 services:
   cloudflared:
@@ -20,14 +18,16 @@ services:
     depends_on:
       - cloudflared
     environment:
-      - DNSMASQ_USER=pihole
-      - WEBPASSWORD=#etc92*oi!
       - TZ=America/Sao_Paulo
-      - PIHOLE_DNS_=127.0.0.1#5054
-      - WEB_PORT=8053
+      - FTLCONF_webserver_api_password=#etc92*oi!
+      - FTLCONF_dns_upstreams=127.0.0.1#5054
+      - FTLCONF_webserver_port=8053
+      - DNSMASQ_USER=pihole
     volumes:
-      - /home/bbsa/dnsmasq.d:/etc/dnsmasq.d
-      - /home/bbsa/pihole:/etc/pihole
+      - /home/docker/dnsmasq.d:/etc/dnsmasq.d
+      - /home/docker/pihole:/etc/pihole
     network_mode: host
     cap_add:
       - NET_RAW
+      - NET_ADMIN
+      - SYS_NICE

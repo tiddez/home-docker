@@ -1,10 +1,9 @@
-version: '3'
-
-# If you need a custom name, use the x- prefix
-x-name: 'utils'
+name: utils
 
 volumes:
   portainer_data:
+    name: compose_portainer_data
+    external: true
 
 services:
   portainer:
@@ -23,7 +22,7 @@ services:
       - PUID=1000
       - PGID=1000
     volumes:
-      - /home/bbsa/organizr:/config
+      - /home/docker/organizr:/config
     ports:
       - '80:80'
     cap_add:
@@ -32,24 +31,13 @@ services:
   watchtower:
     image: containrrr/watchtower:latest
     restart: unless-stopped
+    environment:
+      - DOCKER_API_VERSION=1.45
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     cap_add:
       - NET_RAW
       - SETUID
-
-  zerotier:
-    image: zerotier/zerotier:latest
-    restart: unless-stopped
-    volumes:
-      - /home/bbsa/zerotier:/var/lib/zerotier-one
-    devices:
-      - /dev/net/tun:/dev/net/tun
-    cap_add:
-      - NET_ADMIN
-      - NET_RAW
-      - SYS_ADMIN
-    network_mode: host
 
   librespeed:
     image: lscr.io/linuxserver/librespeed:latest
@@ -59,6 +47,6 @@ services:
       - PUID=1000
       - PGID=1000
     volumes:
-      - /home/bbsa/librespeed:/config
+      - /home/docker/librespeed:/config
     ports:
       - '9091:80'

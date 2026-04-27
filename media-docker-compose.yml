@@ -1,6 +1,4 @@
-version: '3'
-
-x-name: 'media'
+name: media
 
 services:
   qbittorrent:
@@ -12,8 +10,8 @@ services:
       - PUID=1000
       - PGID=1000
     volumes:
-      - /home/bbsa/qbittorrent/config:/config
-      - /mnt/docker/Downloads/torrents:/downloads
+      - /home/docker/qbittorrent/config:/config
+      - /mnt/storage/Downloads/torrents:/downloads
     ports:
       - '8080:8080'
       - '62609:62609'
@@ -26,8 +24,8 @@ services:
       - PUID=1000
       - PGID=1000
     volumes:
-      - /home/bbsa/jackett/downloads:/downloads
-      - /home/bbsa/jackett/config:/config
+      - /home/docker/jackett/downloads:/downloads
+      - /home/docker/jackett/config:/config
     ports:
       - '9117:9117'
 
@@ -39,9 +37,9 @@ services:
       - PUID=1000
       - PGID=1000
     volumes:
-      - /mnt/docker/Videos/radarr:/movies
-      - /mnt/docker/Videos/sonarr:/tv
-      - /home/bbsa/bazarr/appdata/config:/config
+      - /mnt/storage/Videos/radarr:/movies
+      - /mnt/storage/Videos/sonarr:/tv
+      - /home/docker/bazarr/appdata/config:/config
     ports:
       - '6767:6767'
 
@@ -54,7 +52,7 @@ services:
       - TZ=America/Sao_Paulo
       - PORT=5055
     volumes:
-      - /home/bbsa/overseerr/config:/app/config
+      - /home/docker/overseerr/config:/app/config
     ports:
       - '5055:5055'
 
@@ -68,7 +66,7 @@ services:
       - PUID=1000
       - PGID=1000
     volumes:
-      - /home/bbsa/prowlarr/config:/config
+      - /home/docker/prowlarr/config:/config
     ports:
       - '9696:9696'
 
@@ -76,7 +74,7 @@ services:
     image: ghcr.io/flaresolverr/flaresolverr:latest
     restart: unless-stopped
     volumes:
-      - /home/bbsa/flaresolverr/config:/config
+      - /home/docker/flaresolverr/config:/config
     ports:
       - '8191:8191'
 
@@ -88,9 +86,9 @@ services:
       - PUID=1000
       - PGID=1000
     volumes:
-      - /mnt/docker/Downloads/nzbget:/downloads
-      - /mnt/docker/Downloads/nzbget/incomplete:/incomplete-downloads
-      - /home/bbsa/nzbget/config:/config
+      - /mnt/storage/Downloads/nzbget:/downloads
+      - /mnt/storage/Downloads/nzbget/incomplete:/incomplete-downloads
+      - /home/docker/nzbget/config:/config
     ports:
       - '6789:6789'
 
@@ -104,10 +102,9 @@ services:
       - PUID=1000
       - PGID=1000
     volumes:
-      - /home/bbsa/radarr/appdata/config:/config
-      - /mnt/docker/Downloads/torrents:/downloads
-      - /mnt/docker/Videos/radarr/movies:/movies
-      - /mnt/docker/Videos/radarr/tvshow:/tvshow
+      - /home/docker/radarr/appdata/config:/config
+      - /mnt/storage/Downloads/torrents:/downloads
+      - /mnt/storage/Videos/radarr/movies:/movies
     ports:
       - '7878:7878'
 
@@ -121,9 +118,9 @@ services:
       - PUID=1000
       - PGID=1000
     volumes:
-      - /home/bbsa/sonarr/appdata/config:/config
-      - /mnt/docker/Videos/sonarr:/tv
-      - /mnt/docker/Downloads/torrents:/downloads
+      - /home/docker/sonarr/appdata/config:/config
+      - /mnt/storage/Videos/sonarr:/tv
+      - /mnt/storage/Downloads/torrents:/downloads
     ports:
       - '8989:8989'
 
@@ -137,11 +134,10 @@ services:
       - PGID=1000
       - VA_DRIVER=IHD
     volumes:
-      - /home/bbsa/plex/config:/config
-      - /home/bbsa/plex/data:/data
-      - /home/bbsa/plex/transcode:/transcode
-      - /mnt/docker/Videos:/media
+      - /home/docker/plex/config:/config
+      - /home/docker/plex/data:/data
+      - /home/docker/plex/transcode:/transcode
+      - /mnt/storage/Videos:/media
     devices:
       - /dev/dri:/dev/dri
-      - /dev/bus/usb:/dev/bus/usb
     network_mode: host
