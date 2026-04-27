@@ -139,4 +139,4 @@ services:
     restart: unless-stopped
     networks: [monitoring]
     volumes:
-      - /home/docker/monitoring/pve.yml:/etc/pve.yml:ro
+      - /home/docker/monitoring/pve.yml:/etc/prometheus/pve.yml:ro
