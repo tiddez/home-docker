@@ -133,3 +133,10 @@ services:
       - grafana_data:/var/lib/grafana
       - /home/docker/monitoring/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
     security_opt: ["no-new-privileges:true"]
+
+  pve-exporter:
+    image: prompve/prometheus-pve-exporter:latest
+    restart: unless-stopped
+    networks: [monitoring]
+    volumes:
+      - /home/docker/monitoring/pve.yml:/etc/pve.yml:ro
