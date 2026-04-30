@@ -68,13 +68,13 @@
 
 ### Storage Pools (pvesm)
 
-| Pool ID | Type | Path / Backing | Size | Content |
-|---|---|---|---|---|
-| local | dir | /var/lib/vz | 68 GB | ISO, templates, backups |
-| local-lvm | lvmthin | pve/data | 141.5 GB | VM disks (system) |
-| vm-storage | lvmthin | vm-storage/vm-storage | 912.8 GB | VM disks (production) |
-| backup-pool | dir | /mnt/pve/backup-pool | 8.0 TB | Backups, ISO, templates |
-| smb-share | dir | /mnt/pve/smb-share | 1.0 TB | Images, snippets, network share |
+| Pool ID | Type | Path / Backing | Size | Content | Role |
+|---|---|---|---|---|---|
+| local | dir | /var/lib/vz | 68 GB | ISO image, Container template | Static files (ISOs, LXC templates) |
+| local-lvm | lvmthin | pve/data | 141.5 GB | Disk image, Container | System VMs / LXCs (NVMe-fast) |
+| vm-storage | lvmthin | vm-storage/vm-storage | 912.8 GB | Disk image, Container | Production VMs (SSD) |
+| backup-pool | dir | /mnt/pve/backup-pool | 8.0 TB | Backup | VM/CT backups (HDD-cold) |
+| smb-share | dir | /mnt/pve/smb-share | 1.0 TB | Snippets | Cloud-init / hookscripts; backs the Samba share |
 
 ### LVM Layout — sdb (9.1 TB)
 
