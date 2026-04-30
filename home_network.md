@@ -104,7 +104,7 @@ lvresize -L +500G --resizefs /dev/vg-backup/smb-share
 
 | VMID | Name | Type | OS Disk | Data Disk | Storage Pool |
 |---|---|---|---|---|---|
-| 100 | Docker | VM | 32 GB | 400 GB | vm-storage |
+| 100 | Docker | VM | 32 GB | 400 GB | vm-storage + iGPU passthrough (UHD 630, 0000:00:02.0) |
 | 101 | SportClip | VM | 32 GB | 100 GB | vm-storage |
 | 102 | unifi | LXC | 10 GB | — | local-lvm |
 
