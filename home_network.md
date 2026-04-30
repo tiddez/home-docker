@@ -38,7 +38,7 @@
 | Radarr | Up | http://192.168.50.30:7878 |
 | Sonarr | Up | http://192.168.50.30:8989 |
 | Bazarr | Up | http://192.168.50.30:6767 |
-| Overseerr | Up | http://192.168.50.30:5055 |
+| Seerr | Up | http://192.168.50.30:5055 |
 | Plex | Starting | http://192.168.50.30:32400 |
 
 ---
