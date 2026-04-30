@@ -1,0 +1,47 @@
+tunnel: <TUNNEL_NAME>
+credentials-file: /etc/cloudflared/<TUNNEL_UUID>.json
+
+ingress:
+  - hostname: proxmox.example.com
+    service: https://192.168.50.20:8006
+    originRequest:
+      httpHostHeader: proxmox.example.com
+      noTLSVerify: true        # Proxmox uses a self-signed cert
+  - hostname: plex.example.com
+    service: http://192.168.50.30:32400
+    originRequest:
+      httpHostHeader: plex.example.com
+  - hostname: seerr.example.com
+    service: http://192.168.50.30:5055
+    originRequest:
+      httpHostHeader: seerr.example.com
+  - hostname: radarr.example.com
+    service: http://192.168.50.30:7878
+    originRequest:
+      httpHostHeader: radarr.example.com
+  - hostname: sonarr.example.com
+    service: http://192.168.50.30:8989
+    originRequest:
+      httpHostHeader: sonarr.example.com
+  - hostname: bazarr.example.com
+    service: http://192.168.50.30:6767
+    originRequest:
+      httpHostHeader: bazarr.example.com
+  - hostname: prowlarr.example.com
+    service: http://192.168.50.30:9696
+    originRequest:
+      httpHostHeader: prowlarr.example.com
+  - hostname: portainer.example.com
+    service: http://192.168.50.30:9000
+    originRequest:
+      httpHostHeader: portainer.example.com
+  - hostname: zabbix.example.com
+    service: http://192.168.50.30:8082
+    originRequest:
+      httpHostHeader: zabbix.example.com
+  - hostname: grafana.example.com
+    service: http://192.168.50.30:3001
+    originRequest:
+      httpHostHeader: grafana.example.com
+  # Catch-all rule -- MUST be the last entry
+  - service: http_status:404
