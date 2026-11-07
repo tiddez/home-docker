@@ -168,6 +168,35 @@ Session\ShareLimitAction=Stop
 
 Whichever comes first stops the torrent; Radarr/Sonarr then remove it and its files from the downloads folder. With hardlinks only the download-side name is deleted — the library file keeps the data and Plex is unaffected. Only deleting a movie in Radarr (*Delete files*) or Plex removes it from the library.
 
+## 10. Cleanup of unwanted media
+
+Removed on request (not tracked by Radarr/Sonarr):
+
+| Item | Where | Size |
+|---|---|---|
+| Iron Man (2008) | qBittorrent + downloads folder | 12.3 GB |
+| Iron Man 2 (2010) | qBittorrent + downloads folder | 6.0 GB |
+| The Walking Dead: Daryl Dixon S01 | qBittorrent + downloads folder | 2.3 GB |
+| Guardians of the Galaxy Vol. 3 Remux | loose file in movies root | 43 GB |
+| Madoff (2016) | Plex entry only (files were already gone) | — |
+
+Torrents were removed by moving their `BT_backup` entries to `/home/docker/backups/removed-torrents-2026-11-07/` while qBittorrent was stopped. A duplicate rescan afterwards found **0** duplicate files. `/mnt/storage`: **191 GB → 129 GB used (28%)**.
+
+## How to delete media
+
+Always delete in **Radarr** (movies) or **Sonarr** (series) — they own the library:
+
+1. Open the item → **Delete**
+2. Check **Delete Movie Folder** / **Delete Series Folder** (removes the files)
+3. Check **Add List Exclusion** if it should never come back
+
+Then:
+- **Plex** removes it automatically (library auto-scan is on).
+- **qBittorrent**: if still seeding, the download-side hardlink keeps the data until the seeding limit (≤ 7 days), then Radarr/Sonarr remove it. To free space immediately, also delete the torrent in qBittorrent with *Also remove files*.
+- **Seerr**: delete the request if there was one.
+
+Don't delete only in Plex or only on disk — Radarr/Sonarr still monitor the item, see it missing, and download it again. Deleting only in qBittorrent removes just the download copy.
+
 ---
 
 ## Open items
@@ -175,6 +204,5 @@ Whichever comes first stops the torrent; Radarr/Sonarr then remove it and its fi
 | Item | Impact | Notes |
 |---|---|---|
 | **Legacy `/downloads` mount** | Cosmetic | Remove from qBittorrent, Radarr and Sonarr after the pre-2026-11-07 torrents finish seeding (by ~2026-11-14). |
-| **Unmanaged files** | Not in Radarr/Sonarr | Iron Man (2008), Iron Man 2, Daryl Dixon S01 in downloads; `Guardians.of.the.Galaxy.Vol.3.2023.REMUX.mkv` loose in the movies root folder. Import or delete manually. |
 | **SABnzbd** | Unused | No Usenet indexer or download client configured in Radarr/Sonarr. |
 | **Router port forward** | Slower torrents | Forward `62609` TCP+UDP to `192.168.50.30`. |
