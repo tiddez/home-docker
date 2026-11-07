@@ -248,5 +248,4 @@ Don't delete only in Plex or only on disk — Radarr/Sonarr still monitor the it
 
 ## Open items
 
-| Item | Impact | Notes |
-|---|---|---|
+None — all items from this session are done.
