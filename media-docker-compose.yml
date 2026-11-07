@@ -15,19 +15,7 @@ services:
     ports:
       - '8080:8080'
       - '62609:62609'
-
-  jackett:
-    image: ghcr.io/linuxserver/jackett:latest
-    restart: unless-stopped
-    environment:
-      - TZ=America/Sao_Paulo
-      - PUID=1000
-      - PGID=1000
-    volumes:
-      - /home/docker/jackett/downloads:/downloads
-      - /home/docker/jackett/config:/config
-    ports:
-      - '9117:9117'
+      - '62609:62609/udp'
 
   bazarr:
     image: ghcr.io/linuxserver/bazarr:latest
@@ -37,30 +25,36 @@ services:
       - PUID=1000
       - PGID=1000
     volumes:
-      - /mnt/storage/Videos/radarr:/movies
+      - /mnt/storage/Videos/radarr/movies:/movies
       - /mnt/storage/Videos/sonarr:/tv
       - /home/docker/bazarr/appdata/config:/config
     ports:
       - '6767:6767'
 
-  overseerr:
-    image: sctx/overseerr
+  seerr:
+    image: ghcr.io/seerr-team/seerr:latest
+    init: true
     restart: unless-stopped
     depends_on:
       - qbittorrent
     environment:
       - TZ=America/Sao_Paulo
       - PORT=5055
+      - LOG_LEVEL=info
     volumes:
       - /home/docker/overseerr/config:/app/config
     ports:
       - '5055:5055'
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:5055/api/v1/settings/public || exit 1
+      start_period: 20s
+      timeout: 3s
+      interval: 15s
+      retries: 3
 
   prowlarr:
     image: ghcr.io/hotio/prowlarr:latest
     restart: unless-stopped
-    depends_on:
-      - flaresolverr
     environment:
       - TZ=America/Sao_Paulo
       - PUID=1000
@@ -69,14 +63,6 @@ services:
       - /home/docker/prowlarr/config:/config
     ports:
       - '9696:9696'
-
-  flaresolverr:
-    image: ghcr.io/flaresolverr/flaresolverr:latest
-    restart: unless-stopped
-    volumes:
-      - /home/docker/flaresolverr/config:/config
-    ports:
-      - '8191:8191'
 
   sabnzbd:
     image: lscr.io/linuxserver/sabnzbd:latest
@@ -128,6 +114,8 @@ services:
     image: plexinc/pms-docker:latest
     shm_size: '2gb'
     restart: unless-stopped
+    group_add:
+      - '993'  # render group GID (for /dev/dri/renderD128 access)
     environment:
       - TZ=America/Sao_Paulo
       - PUID=1000

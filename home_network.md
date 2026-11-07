@@ -32,14 +32,12 @@
 |---|---|---|
 | qBittorrent | Up | http://192.168.50.30:8080 |
 | SABnzbd | Up | http://192.168.50.30:6789 |
-| Jackett | Up | http://192.168.50.30:9117 |
 | Prowlarr | Up | http://192.168.50.30:9696 |
-| FlareSolverr | Up | http://192.168.50.30:8191 |
 | Radarr | Up | http://192.168.50.30:7878 |
 | Sonarr | Up | http://192.168.50.30:8989 |
 | Bazarr | Up | http://192.168.50.30:6767 |
 | Seerr | Up | http://192.168.50.30:5055 |
-| Plex | Starting | http://192.168.50.30:32400 |
+| Plex | Up | http://192.168.50.30:32400 |
 
 ---
 

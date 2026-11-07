@@ -8,7 +8,7 @@ Services are split into **4 separate stacks**, each with its own compose file:
 
 | Stack | File | Services |
 |-------|------|----------|
-| `media` | `media-docker-compose.yml` | Plex, Radarr, Sonarr, qBittorrent, Jackett, SABnzbd, Bazarr, Overseerr, Prowlarr, Flaresolverr |
+| `media` | `media-docker-compose.yml` | Plex, Radarr, Sonarr, qBittorrent, SABnzbd, Bazarr, Seerr, Prowlarr |
 | `net` | `net-docker-compose.yml` | Cloudflared, Pi-hole |
 | `monitoring` | `monitoring-docker-compose.yml` | Zabbix, Prometheus, Grafana, cAdvisor, Node Exporter |
 | `utils` | `utils-docker-compose.yml` | Portainer, Organizr, Watchtower, Librespeed |
@@ -33,36 +33,36 @@ docker compose -f utils-docker-compose.yml up -d
 ## Services
 
 ### Media Stack
-1. **plex** — Media server for streaming content (`network_mode: host`)
+1. **plex** — Media server for streaming content (`network_mode: host`, iGPU via `/dev/dri`)
 2. **radarr** — Movie downloader and manager (`:7878`)
 3. **sonarr** — TV series downloader and manager (`:8989`)
-4. **qbittorrent** — Torrent client (`:8080`)
-5. **jackett** — Torrent indexer (`:9117`)
-6. **sabnzbd** — Usenet/NZB downloader (`:6789`)
-7. **bazarr** — Subtitle management (`:6767`)
-8. **overseerr** — Media request management (`:5055`)
-9. **prowlarr** — Unified indexer for Radarr/Sonarr (`:9696`)
-10. **flaresolverr** — Anti-bot bypass for indexers (`:8191`)
+4. **qbittorrent** — Torrent client (`:8080`, peer port `62609` TCP+UDP)
+5. **sabnzbd** — Usenet/NZB downloader (`:6789`)
+6. **bazarr** — Subtitle management, pt-BR (`:6767`)
+7. **seerr** — Media request management (`:5055`)
+8. **prowlarr** — Unified indexer for Radarr/Sonarr (`:9696`)
+
+> Jackett and FlareSolverr were removed on 2026-11-07 — see [`media-tuning-2026-11-07.md`](media-tuning-2026-11-07.md).
 
 ### Net Stack
-11. **cloudflared** — DNS-over-HTTPS resolver via Cloudflare (`network_mode: host`)
-12. **pihole** — Network-wide ad blocker (`network_mode: host`, web UI `:8053`)
+9. **cloudflared** — DNS-over-HTTPS resolver via Cloudflare (`network_mode: host`)
+10. **pihole** — Network-wide ad blocker (`network_mode: host`, web UI `:8053`)
 
 ### Monitoring Stack
-13. **zabbix-server** — Infrastructure monitoring server (`:10051`)
-14. **zabbix-web** — Zabbix web UI (`:8082`)
-15. **zabbix-db** — PostgreSQL backend for Zabbix
-16. **zabbix-agent** — Agent running on Docker host
-17. **prometheus** — Metrics collection and storage (`:9090`)
-18. **grafana** — Metrics visualization dashboards (`:3001`)
-19. **cadvisor** — Container resource usage metrics
-20. **node-exporter** — Host-level hardware/OS metrics
+11. **zabbix-server** — Infrastructure monitoring server (`:10051`)
+12. **zabbix-web** — Zabbix web UI (`:8082`)
+13. **zabbix-db** — PostgreSQL backend for Zabbix
+14. **zabbix-agent** — Agent running on Docker host
+15. **prometheus** — Metrics collection and storage (`:9090`)
+16. **grafana** — Metrics visualization dashboards (`:3001`)
+17. **cadvisor** — Container resource usage metrics
+18. **node-exporter** — Host-level hardware/OS metrics
 
 ### Utils Stack
-21. **portainer** — Docker web UI (`:9000`)
-22. **organizr** — Service dashboard (`:80`)
-23. **watchtower** — Automatic container updates
-24. **librespeed** — Self-hosted speed test (`:9091`)
+19. **portainer** — Docker web UI (`:9000`)
+20. **organizr** — Service dashboard (`:80`)
+21. **watchtower** — Automatic container updates
+22. **librespeed** — Self-hosted speed test (`:9091`)
 
 ## Access URLs
 
@@ -77,7 +77,9 @@ docker compose -f utils-docker-compose.yml up -d
 | qBittorrent | `http://<host>:8080` |
 | Radarr | `http://<host>:7878` |
 | Sonarr | `http://<host>:8989` |
-| Overseerr | `http://<host>:5055` |
+| Seerr | `http://<host>:5055` |
+| Prowlarr | `http://<host>:9696` |
+| Bazarr | `http://<host>:6767` |
 | Organizr | `http://<host>:80` |
 | Librespeed | `http://<host>:9091` |
 
