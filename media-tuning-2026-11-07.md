@@ -110,7 +110,7 @@ qBittorrent listened on `42190`, but Docker only published `62609/tcp`, so no pe
 
 - `Session\Port=62609` in `/home/docker/qbittorrent/config/qBittorrent/qBittorrent.conf`
 - Added `62609:62609/udp` to the compose file (uTP/DHT)
-- **To do on the router:** forward `62609` TCP+UDP → `192.168.50.30` for full incoming connectivity.
+- **Router:** `62609` TCP+UDP forwarded to `192.168.50.30` on the MikroTik (done 2026-11-07) — rules in `tiddez/home-network`, `mikrotik/port-forwards.md`.
 
 ## 7. Watchtower cleanup
 
@@ -250,4 +250,3 @@ Don't delete only in Plex or only on disk — Radarr/Sonarr still monitor the it
 
 | Item | Impact | Notes |
 |---|---|---|
-| **Router port forward** | Slower torrents | MikroTik RB750Gr3: dst-nat `62609` TCP+UDP → `192.168.50.30` (public IP, not CGNAT — WireGuard already reachable). Without it, only peers with an open port can connect. |
