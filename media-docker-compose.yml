@@ -11,6 +11,8 @@ services:
       - PGID=1000
     volumes:
       - /home/docker/qbittorrent/config:/config
+      - /mnt/storage:/data
+      # legacy path for torrents added before 2026-11-07 — remove once they finish seeding
       - /mnt/storage/Downloads/torrents:/downloads
     ports:
       - '8080:8080'
@@ -25,8 +27,7 @@ services:
       - PUID=1000
       - PGID=1000
     volumes:
-      - /mnt/storage/Videos/radarr/movies:/movies
-      - /mnt/storage/Videos/sonarr:/tv
+      - /mnt/storage:/data
       - /home/docker/bazarr/appdata/config:/config
     ports:
       - '6767:6767'
@@ -42,7 +43,7 @@ services:
       - PORT=5055
       - LOG_LEVEL=info
     volumes:
-      - /home/docker/overseerr/config:/app/config
+      - /home/docker/overseerr/config:/app/config  # folder name kept from the Overseerr -> Seerr migration
     ports:
       - '5055:5055'
     healthcheck:
@@ -89,8 +90,9 @@ services:
       - PGID=1000
     volumes:
       - /home/docker/radarr/appdata/config:/config
+      - /mnt/storage:/data
+      # legacy path for torrents added before 2026-11-07 — remove once they finish seeding
       - /mnt/storage/Downloads/torrents:/downloads
-      - /mnt/storage/Videos/radarr/movies:/movies
     ports:
       - '7878:7878'
 
@@ -105,7 +107,8 @@ services:
       - PGID=1000
     volumes:
       - /home/docker/sonarr/appdata/config:/config
-      - /mnt/storage/Videos/sonarr:/tv
+      - /mnt/storage:/data
+      # legacy path for torrents added before 2026-11-07 — remove once they finish seeding
       - /mnt/storage/Downloads/torrents:/downloads
     ports:
       - '8989:8989'

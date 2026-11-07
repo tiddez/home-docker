@@ -86,6 +86,7 @@ docker compose -f utils-docker-compose.yml up -d
 ## Notes
 
 - All volumes use bind mounts to `/home/docker/<service>/` for easy backup.
+- qBittorrent, Radarr, Sonarr and Bazarr share one media mount, `/mnt/storage:/data`, so imports are hardlinks instead of copies (downloads in `/data/Downloads/torrents`, library in `/data/Videos`). Keep it a single mount — separate download/library mounts break hardlinks.
 - Named volumes are used for Portainer (`compose_portainer_data`) and Zabbix DB (`compose_zabbix_db`).
 - Adjust `TZ`, `PUID`, and `PGID` for your system.
 - Pi-hole and Cloudflared use `network_mode: host` — see `Infos.md` for port 53 conflict resolution.

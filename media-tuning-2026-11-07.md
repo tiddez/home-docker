@@ -11,6 +11,8 @@
 | Subtitles | Bazarr never downloaded pt-BR | No providers enabled + wrong `/movies` mount |
 | qBittorrent | Listening port ≠ published port (no incoming peers) | Listening port set to `62609`, TCP+UDP published |
 | Root disk | Watchtower left old images behind (13 GB reclaimable) | `WATCHTOWER_CLEANUP=true` |
+| Duplicated media | Imports were copied, not hardlinked (137 GB stored twice) | Single `/mnt/storage:/data` mount + existing duplicates hardlinked → `/mnt/storage` 70% → 42% |
+| Seeding | Torrents seeded forever, so completed downloads were never removed | Ratio 2.0 or 7 days, then Radarr/Sonarr remove them |
 
 All app settings live in bind-mounted config folders (`/home/docker/<app>/config`), so recreating containers does not lose configuration. Backups of every file changed are on the Docker VM with the suffix `.bak-2026-11-07`.
 
@@ -98,7 +100,7 @@ Example: *La Casa de Papel* (original Spanish) → Spanish, English and MULTi al
 
 Two problems:
 1. **No providers enabled** → enabled OpenSubtitles.com and Subdl; language profile *bbsa* = `pb` (Portuguese – Brazil).
-2. **Wrong mount**: Radarr mounts `/mnt/storage/Videos/radarr/movies:/movies`, Bazarr mounted `/mnt/storage/Videos/radarr:/movies`, so every Radarr path was "Path does not exist". Fixed the Bazarr mount to match Radarr and cleared the temporary movie path mapping (`/movies → /movies/movies`).
+2. **Wrong mount**: Radarr mounts `/mnt/storage/Videos/radarr/movies:/movies`, Bazarr mounted `/mnt/storage/Videos/radarr:/movies`, so every Radarr path was "Path does not exist". Fixed the Bazarr mount to match Radarr and cleared the temporary movie path mapping (`/movies → /movies/movies`). Later superseded by the shared `/data` mount (§8).
 
 Bazarr → Plex connection re-authenticated (was failing with 401), so Plex refreshes items after a subtitle download.
 
@@ -114,13 +116,65 @@ qBittorrent listened on `42190`, but Docker only published `62609/tcp`, so no pe
 
 Watchtower updated `:latest` images daily without deleting old ones (13 GB reclaimable on the 52 GB root disk — same root cause as [disk-maintenance-2026-05-17](disk-maintenance-2026-05-17.md)). Added `WATCHTOWER_CLEANUP=true` in `utils-docker-compose.yml`.
 
+## 8. Hardlinks: one shared `/data` mount
+
+### Problem
+Downloads (`/downloads`) and the library (`/movies`, `/tv`) were separate bind mounts. A hardlink cannot cross mount points (`EXDEV`), so Radarr/Sonarr **copied** every import, even with *Use Hardlinks instead of Copy* enabled. Each movie was stored twice while seeding.
+
+### Fix
+qBittorrent, Radarr, Sonarr and Bazarr all mount `/mnt/storage:/data`, so downloads and library are on the same mount and imports are instant hardlinks.
+
+| App | Before | After |
+|---|---|---|
+| qBittorrent save path | `/downloads/` | `/data/Downloads/torrents/` |
+| qBittorrent temp path | `/downloads/incomplete/` | `/data/Downloads/torrents/incomplete/` |
+| Radarr root folder (+ movies, collections) | `/movies` | `/data/Videos/radarr/movies` |
+| Sonarr root folder | `/tv` | `/data/Videos/sonarr` |
+| Seerr default directory | `/movies`, `/tv` | same as Radarr/Sonarr |
+| Bazarr | `/movies`, `/tv` | `/data` (same paths as Radarr/Sonarr, no path mappings) |
+| Plex | `/media` | unchanged |
+
+Radarr movies were re-pointed with the movie editor using *Move files = No* — no files moved on disk. Hardlink verified inside Radarr (`ln` across `/data/Downloads` → `/data/Videos` = 2 links).
+
+The old `/mnt/storage/Downloads/torrents:/downloads` mount is **kept** in qBittorrent, Radarr and Sonarr for torrents added before this change (their saved paths are `/downloads/...`). Remove it once those torrents are gone (≤ 7 days, see §9).
+
+### Existing duplicates
+Every download file was matched to a library file by identical size plus SHA-256 of three 8 MB samples (start, middle, end). The 5 matches were replaced with hardlinks to the library file, so torrents keep seeding without using extra space:
+
+| Download | Size |
+|---|---|
+| The Godfather (1972) Remux | 49.0 GB |
+| The Avengers (2012) Remux | 32.6 GB |
+| Iron Man 3 (2013) Remux | 28.4 GB |
+| Thor: The Dark World (2013) Remux | 25.2 GB |
+| Thor (2011) Bluray-1080p | 2.2 GB |
+| **Total** | **137.4 GB** |
+
+Result: `/mnt/storage` **319 GB → 191 GB used (70% → 42%)**. Library files were not modified.
+
+Not duplicates (not in the library), left untouched: Iron Man (2008), Iron Man 2 (2010), The Walking Dead: Daryl Dixon S01.
+
+Backups taken before the change: `/home/docker/backups/pre-hardlinks-2026-11-07/` (Radarr/Sonarr backup zips, qBittorrent config, compose file, Seerr settings) and `bazarr.db.bak-2026-11-07`.
+
+## 9. Seeding limit
+
+qBittorrent had no share limit, so torrents seeded forever and Radarr/Sonarr *Remove Completed Downloads* never triggered.
+
+```ini
+Session\GlobalMaxRatio=2
+Session\GlobalMaxSeedingMinutes=10080   ; 7 days
+Session\ShareLimitAction=Stop
+```
+
+Whichever comes first stops the torrent; Radarr/Sonarr then remove it and its files from the downloads folder. With hardlinks only the download-side name is deleted — the library file keeps the data and Plex is unaffected. Only deleting a movie in Radarr (*Delete files*) or Plex removes it from the library.
+
 ---
 
 ## Open items
 
 | Item | Impact | Notes |
 |---|---|---|
-| **Hardlinks** | ~148 GB duplicated | Downloads (`/downloads`) and library (`/movies`, `/tv`) are separate bind mounts, so Radarr/Sonarr *copy* instead of hardlink, even with "Use Hardlinks" on. Fix: single `/mnt/storage:/data` mount in qBittorrent, Radarr, Sonarr, Bazarr and update paths. |
-| **Seeding limit** | Downloads never cleaned | qBittorrent has no ratio/seeding-time limit, so Radarr/Sonarr "Remove Completed" never triggers. |
+| **Legacy `/downloads` mount** | Cosmetic | Remove from qBittorrent, Radarr and Sonarr after the pre-2026-11-07 torrents finish seeding (by ~2026-11-14). |
+| **Unmanaged files** | Not in Radarr/Sonarr | Iron Man (2008), Iron Man 2, Daryl Dixon S01 in downloads; `Guardians.of.the.Galaxy.Vol.3.2023.REMUX.mkv` loose in the movies root folder. Import or delete manually. |
 | **SABnzbd** | Unused | No Usenet indexer or download client configured in Radarr/Sonarr. |
 | **Router port forward** | Slower torrents | Forward `62609` TCP+UDP to `192.168.50.30`. |
