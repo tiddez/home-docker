@@ -12,8 +12,6 @@ services:
     volumes:
       - /home/docker/qbittorrent/config:/config
       - /mnt/storage:/data
-      # legacy path for torrents added before 2026-11-07 — remove once they finish seeding
-      - /mnt/storage/Downloads/torrents:/downloads
     ports:
       - '8080:8080'
       - '62609:62609'
@@ -77,8 +75,6 @@ services:
     volumes:
       - /home/docker/radarr/appdata/config:/config
       - /mnt/storage:/data
-      # legacy path for torrents added before 2026-11-07 — remove once they finish seeding
-      - /mnt/storage/Downloads/torrents:/downloads
     ports:
       - '7878:7878'
 
@@ -94,8 +90,6 @@ services:
     volumes:
       - /home/docker/sonarr/appdata/config:/config
       - /mnt/storage:/data
-      # legacy path for torrents added before 2026-11-07 — remove once they finish seeding
-      - /mnt/storage/Downloads/torrents:/downloads
     ports:
       - '8989:8989'
 

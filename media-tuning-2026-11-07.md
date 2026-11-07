@@ -136,7 +136,9 @@ qBittorrent, Radarr, Sonarr and Bazarr all mount `/mnt/storage:/data`, so downlo
 
 Radarr movies were re-pointed with the movie editor using *Move files = No* — no files moved on disk. Hardlink verified inside Radarr (`ln` across `/data/Downloads` → `/data/Videos` = 2 links).
 
-The old `/mnt/storage/Downloads/torrents:/downloads` mount is **kept** in qBittorrent, Radarr and Sonarr for torrents added before this change (their saved paths are `/downloads/...`). Remove it once those torrents are gone (≤ 7 days, see §9).
+The old `/mnt/storage/Downloads/torrents:/downloads` mount was first kept for the 5 torrents added before this change (saved path `/downloads`), then removed the same day: with qBittorrent stopped, `save_path` and `qBt-savePath` in their `BT_backup/*.fastresume` files were rewritten from `/downloads` to `/data/Downloads/torrents` (same host folder, so no data moved and hardlinks kept). All 5 restored without file errors. Backup of the original records: `/home/docker/backups/pre-hardlinks-2026-11-07/BT_backup-before-path-rewrite`.
+
+> Don't use qBittorrent's *Set location* to move torrents between two different mounts — it copies the data and breaks hardlinks.
 
 ### Existing duplicates
 Every download file was matched to a library file by identical size plus SHA-256 of three 8 MB samples (start, middle, end). The 5 matches were replaced with hardlinks to the library file, so torrents keep seeding without using extra space:
@@ -248,5 +250,4 @@ Don't delete only in Plex or only on disk — Radarr/Sonarr still monitor the it
 
 | Item | Impact | Notes |
 |---|---|---|
-| **Legacy `/downloads` mount** | Cosmetic | Remove from qBittorrent, Radarr and Sonarr after the pre-2026-11-07 torrents finish seeding (by ~2026-11-14). |
-| **Router port forward** | Slower torrents | Forward `62609` TCP+UDP to `192.168.50.30`. |
+| **Router port forward** | Slower torrents | MikroTik RB750Gr3: dst-nat `62609` TCP+UDP → `192.168.50.30` (public IP, not CGNAT — WireGuard already reachable). Without it, only peers with an open port can connect. |
