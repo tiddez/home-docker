@@ -37,7 +37,7 @@ docker compose -f utils-docker-compose.yml up -d
 2. **radarr** — Movie downloader and manager (`:7878`)
 3. **sonarr** — TV series downloader and manager (`:8989`)
 4. **qbittorrent** — Torrent client (`:8080`, peer port `62609` TCP+UDP)
-5. **sabnzbd** — Usenet/NZB downloader (`:6789`)
+5. **sabnzbd** — Usenet/NZB downloader (`:6789`, Usenet trial — see change log §11)
 6. **bazarr** — Subtitle management, pt-BR (`:6767`)
 7. **seerr** — Media request management (`:5055`)
 8. **prowlarr** — Unified indexer for Radarr/Sonarr (`:9696`)
@@ -86,7 +86,7 @@ docker compose -f utils-docker-compose.yml up -d
 ## Notes
 
 - All volumes use bind mounts to `/home/docker/<service>/` for easy backup.
-- qBittorrent, Radarr, Sonarr and Bazarr share one media mount, `/mnt/storage:/data`, so imports are hardlinks instead of copies (downloads in `/data/Downloads/torrents`, library in `/data/Videos`). Keep it a single mount — separate download/library mounts break hardlinks.
+- qBittorrent, SABnzbd, Radarr, Sonarr and Bazarr share one media mount, `/mnt/storage:/data`, so imports are hardlinks instead of copies (downloads in `/data/Downloads/torrents`, library in `/data/Videos`). Keep it a single mount — separate download/library mounts break hardlinks.
 - Named volumes are used for Portainer (`compose_portainer_data`) and Zabbix DB (`compose_zabbix_db`).
 - Adjust `TZ`, `PUID`, and `PGID` for your system.
 - Pi-hole and Cloudflared use `network_mode: host` — see `Infos.md` for port 53 conflict resolution.

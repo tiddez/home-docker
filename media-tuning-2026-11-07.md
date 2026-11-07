@@ -182,6 +182,28 @@ Removed on request (not tracked by Radarr/Sonarr):
 
 Torrents were removed by moving their `BT_backup` entries to `/home/docker/backups/removed-torrents-2026-11-07/` while qBittorrent was stopped. A duplicate rescan afterwards found **0** duplicate files. `/mnt/storage`: **191 GB → 129 GB used (28%)**.
 
+## 11. SABnzbd (Usenet) — prepared for a trial
+
+SABnzbd had never been used (0 history entries): no Usenet server, no Usenet indexer, not connected to Radarr/Sonarr, and the web UI was unreachable because the compose published `6789` (NZBGet's port, left over from an NZBGet → SABnzbd swap) while SABnzbd listens on `8080` inside the container.
+
+| Change | Before | After |
+|---|---|---|
+| Port | `6789:6789` (dead) | `6789:8080` → UI at `http://192.168.50.30:6789` |
+| Config folder | `/home/docker/nzbget/config` | `/home/docker/sabnzbd/config` |
+| Download folders | `/mnt/storage/Downloads/nzbget` (empty) | `/data/Downloads/usenet/{incomplete,complete}` on the shared `/data` mount |
+| Categories | defaults only | `radarr`, `sonarr` |
+| Radarr / Sonarr | qBittorrent only | + SABnzbd download client (tested OK) |
+
+Radarr and Sonarr already prefer Usenet (default delay profile, 0 delay), so once an indexer exists Usenet is tried first and torrents are the fallback.
+
+### To finish the trial
+1. Buy a Usenet **provider** (e.g. Newshosting, Eweka, Frugal — a 1-month plan is enough to test) and an **indexer** (e.g. NZBGeek).
+2. SABnzbd (`:6789`) → setup wizard / Config → Servers → add the provider (host, port 563, SSL, username, password, connections per the plan).
+3. Prowlarr → Indexers → Add → the Usenet indexer (API key). It syncs to Radarr/Sonarr automatically.
+4. Request something in Seerr and check that it arrives via SABnzbd.
+
+To drop Usenet after the trial: remove the indexer in Prowlarr and the SABnzbd client in Radarr/Sonarr, then the `sabnzbd` service from the compose file.
+
 ## How to delete media
 
 Always delete in **Radarr** (movies) or **Sonarr** (series) — they own the library:
@@ -204,5 +226,5 @@ Don't delete only in Plex or only on disk — Radarr/Sonarr still monitor the it
 | Item | Impact | Notes |
 |---|---|---|
 | **Legacy `/downloads` mount** | Cosmetic | Remove from qBittorrent, Radarr and Sonarr after the pre-2026-11-07 torrents finish seeding (by ~2026-11-14). |
-| **SABnzbd** | Unused | No Usenet indexer or download client configured in Radarr/Sonarr. |
+| **Usenet trial** | Waiting on accounts | Add provider in SABnzbd + indexer in Prowlarr (§11), then decide keep or drop. |
 | **Router port forward** | Slower torrents | Forward `62609` TCP+UDP to `192.168.50.30`. |

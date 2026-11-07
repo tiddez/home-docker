@@ -73,11 +73,10 @@ services:
       - PUID=1000
       - PGID=1000
     volumes:
-      - /mnt/storage/Downloads/nzbget:/downloads
-      - /mnt/storage/Downloads/nzbget/incomplete:/incomplete-downloads
-      - /home/docker/nzbget/config:/config
+      - /home/docker/sabnzbd/config:/config
+      - /mnt/storage:/data
     ports:
-      - '6789:6789'
+      - '6789:8080'  # SABnzbd listens on 8080 in the container; host 8080 is qBittorrent
 
   radarr:
     image: ghcr.io/linuxserver/radarr:latest
