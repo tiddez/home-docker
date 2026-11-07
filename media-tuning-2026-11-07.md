@@ -182,7 +182,7 @@ Removed on request (not tracked by Radarr/Sonarr):
 
 Torrents were removed by moving their `BT_backup` entries to `/home/docker/backups/removed-torrents-2026-11-07/` while qBittorrent was stopped. A duplicate rescan afterwards found **0** duplicate files. `/mnt/storage`: **191 GB → 129 GB used (28%)**.
 
-## 11. SABnzbd (Usenet) — prepared for a trial
+## 11. SABnzbd (Usenet) — prepared, then removed
 
 SABnzbd had never been used (0 history entries): no Usenet server, no Usenet indexer, not connected to Radarr/Sonarr, and the web UI was unreachable because the compose published `6789` (NZBGet's port, left over from an NZBGet → SABnzbd swap) while SABnzbd listens on `8080` inside the container.
 
@@ -202,7 +202,30 @@ Radarr and Sonarr already prefer Usenet (default delay profile, 0 delay), so onc
 3. Prowlarr → Indexers → Add → the Usenet indexer (API key). It syncs to Radarr/Sonarr automatically.
 4. Request something in Seerr and check that it arrives via SABnzbd.
 
-To drop Usenet after the trial: remove the indexer in Prowlarr and the SABnzbd client in Radarr/Sonarr, then the `sabnzbd` service from the compose file.
+### Outcome: removed
+Usenet has no free provider for media (only time/data-limited trials that convert to paid plans), so it was dropped for now:
+- SABnzbd download client removed from Radarr and Sonarr (health OK).
+- `sabnzbd` service removed from `media-docker-compose.yml`, container deleted, empty `/mnt/storage/Downloads/usenet` folders removed.
+- **Kept:** `/home/docker/sabnzbd/config` (categories `radarr`/`sonarr` and `/data/Downloads/usenet` paths already set).
+
+To try Usenet later, restore the service block (see commit `c4c51ce`):
+
+```yaml
+  sabnzbd:
+    image: lscr.io/linuxserver/sabnzbd:latest
+    restart: unless-stopped
+    environment:
+      - TZ=America/Sao_Paulo
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - /home/docker/sabnzbd/config:/config
+      - /mnt/storage:/data
+    ports:
+      - '6789:8080'  # SABnzbd listens on 8080 in the container; host 8080 is qBittorrent
+```
+
+then follow *To finish the trial* above, plus re-add SABnzbd as a download client in Radarr/Sonarr (host `192.168.50.30`, port `6789`, categories `radarr`/`sonarr`).
 
 ## How to delete media
 
@@ -226,5 +249,4 @@ Don't delete only in Plex or only on disk — Radarr/Sonarr still monitor the it
 | Item | Impact | Notes |
 |---|---|---|
 | **Legacy `/downloads` mount** | Cosmetic | Remove from qBittorrent, Radarr and Sonarr after the pre-2026-11-07 torrents finish seeding (by ~2026-11-14). |
-| **Usenet trial** | Waiting on accounts | Add provider in SABnzbd + indexer in Prowlarr (§11), then decide keep or drop. |
 | **Router port forward** | Slower torrents | Forward `62609` TCP+UDP to `192.168.50.30`. |

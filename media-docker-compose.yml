@@ -65,19 +65,6 @@ services:
     ports:
       - '9696:9696'
 
-  sabnzbd:
-    image: lscr.io/linuxserver/sabnzbd:latest
-    restart: unless-stopped
-    environment:
-      - TZ=America/Sao_Paulo
-      - PUID=1000
-      - PGID=1000
-    volumes:
-      - /home/docker/sabnzbd/config:/config
-      - /mnt/storage:/data
-    ports:
-      - '6789:8080'  # SABnzbd listens on 8080 in the container; host 8080 is qBittorrent
-
   radarr:
     image: ghcr.io/linuxserver/radarr:latest
     restart: unless-stopped

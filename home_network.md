@@ -31,7 +31,6 @@
 | Container | Status | URL |
 |---|---|---|
 | qBittorrent | Up | http://192.168.50.30:8080 |
-| SABnzbd | Up | http://192.168.50.30:6789 |
 | Prowlarr | Up | http://192.168.50.30:9696 |
 | Radarr | Up | http://192.168.50.30:7878 |
 | Sonarr | Up | http://192.168.50.30:8989 |
